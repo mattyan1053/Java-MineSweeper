@@ -66,14 +66,21 @@ public class Sweeper {
 
 	// ますを開ける
 	public void open(int x, int y) {
+		if(x < 1 || x > width || y < 1 || y > height) return;
 		if(sq[y][x].isOpen()) return;
+		if(sq[y][x].isUserFlaged()) return;
 		sq[y][x].setOpenFlag(true);
 		if(sq[y][x].isBomFlag()) {
 			this.endFlag = true;
 			return;
 		}
 		if(sq[y][x].getBomNum() == 0) {
-			openFull(x, y);
+			for(int i=-1; i<=1;i++) {
+				for(int j=-1;j<=1;j++) {
+					if(i==j) continue;
+					open(x + j, y + i);
+				}
+			}
 		}
 		return;
 	}

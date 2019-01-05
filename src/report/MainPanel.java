@@ -51,7 +51,7 @@ public class MainPanel extends JPanel implements Runnable{
 					g.fillRect(j * boxSize, i * boxSize, boxSize, boxSize);
 					if(s.getBomNum() != 0) {
 						g.setColor(Color.WHITE);
-						g.drawString(String.valueOf(s.getBomNum()), j * boxSize, i * boxSize);
+						g.drawString(String.valueOf(s.getBomNum()), j * boxSize,  i * boxSize);
 					}
 				}
 			}
