@@ -36,6 +36,7 @@ public class MainPanel extends JPanel implements Runnable{
 	public void run() {
 		while(true) {
 			repaint();
+			if(ms.checkFinish() != 0) break;
 		}
 	}
 
@@ -43,15 +44,23 @@ public class MainPanel extends JPanel implements Runnable{
 		for(int i=1; i<=height; i++) {
 			for(int j=1; j<=width; j++) {
 				Square s = ms.getSquare(j , i);
-				if(!s.isOpen()) {
+				if(s.isUserFlaged()){
+					g.setColor(Color.RED);
+					g.fillRect(j * boxSize, i * boxSize, boxSize, boxSize);
+				}
+				else if(!s.isOpen()) {
 					g.setColor(Color.gray);
 					g.fillRect(j * boxSize, i * boxSize, boxSize, boxSize);
 				}else {
 					g.setColor(Color.DARK_GRAY);
 					g.fillRect(j * boxSize, i * boxSize, boxSize, boxSize);
-					if(s.getBomNum() != 0) {
+					if(s.isBomFlag()) {
+						g.setColor(Color.BLACK);
+						g.drawString("●", j * boxSize + boxSize / 3,  i * boxSize + boxSize / 2);
+					}
+					else if(s.getBomNum() != 0) {
 						g.setColor(Color.WHITE);
-						g.drawString(String.valueOf(s.getBomNum()), j * boxSize,  i * boxSize);
+						g.drawString(String.valueOf(s.getBomNum()), j * boxSize + boxSize / 3,  i * boxSize + boxSize / 2);
 					}
 				}
 			}
@@ -124,18 +133,22 @@ public class MainPanel extends JPanel implements Runnable{
 				System.out.println("Over Y");
 				return;
 			}
+			int btn = e.getButton();
 			if(bothFlag == true) {
 				System.out.println("both on");
+				ms.openFull(mx / boxSize,  my / boxSize);
 				bothFlag = false;
-				return;
 			}
-			int btn = e.getButton();
-			if(btn == MouseEvent.BUTTON1) {
+			else if(btn == MouseEvent.BUTTON1 && leftFlag == true) {
 				System.out.println("pushed button1");
 				ms.open(mx / boxSize, my / boxSize);
 				leftFlag = false;
 			}
-			else if(btn == MouseEvent.BUTTON3) rightFlag = false;
+			else if(btn == MouseEvent.BUTTON3 && rightFlag == true) {
+				System.out.println("pushed button3!");
+				ms.setFlag(mx / boxSize, my / boxSize);
+				rightFlag = false;
+			}
 			return;
 		}
 

@@ -77,7 +77,7 @@ public class Sweeper {
 		if(sq[y][x].getBomNum() == 0) {
 			for(int i=-1; i<=1;i++) {
 				for(int j=-1;j<=1;j++) {
-					if(i==j) continue;
+					if(i == 0 && j == 0) continue;
 					open(x + j, y + i);
 				}
 			}
@@ -85,15 +85,23 @@ public class Sweeper {
 		return;
 	}
 
-	// 周りに爆弾がないとき一気にオープン
+	// フラグの数と周りの爆弾の数が一致しているときまとめて周り８マスをオープン
 	public void openFull(int x, int y) {
-		if(sq[y][x].isOpen()) return;
-		open(x, y);
-		if(sq[y][x].getBomNum() != 0) return;
+		if(!sq[y][x].isOpen()) return;
+		if(sq[y][x].getBomNum() == 0) return;
+		int cnt = 0;
 		for(int i=-1; i<=1;i++) {
 			for(int j=-1;j<=1;j++) {
-				if(i==j) continue;
-				open(x + j, y + i);
+				if(i == 0 && j == 0) continue;
+				if(sq[y + i][x + j].isUserFlaged()) cnt++;
+			}
+		}
+		if(cnt == sq[y][x].getBomNum()) {
+			for(int i=-1; i<=1;i++) {
+				for(int j=-1;j<=1;j++) {
+					if(i == 0 && j == 0) continue;
+					open(x + j, y + i);
+				}
 			}
 		}
 		return;
@@ -110,7 +118,9 @@ public class Sweeper {
 		return sq[y][x];
 	}
 
-	public boolean checkClear() {
+	// ゲーム終了チェック 継続:0 クリアー:1 ゲームオーバー:2
+	public int checkFinish() {
+		if(endFlag == true) return 2;
 		int cnt = 0;
 		for(int i=0; i<height; i++) {
 			for(int j=0; j<width; j++) {
@@ -119,7 +129,7 @@ public class Sweeper {
 				}
 			}
 		}
-		return cnt == bomNum;
+		return cnt == bomNum ? 1 : 0;
 	}
 
 }
