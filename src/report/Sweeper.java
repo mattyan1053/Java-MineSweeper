@@ -122,14 +122,14 @@ public class Sweeper {
 	public int checkFinish() {
 		if(endFlag == true) return 2;
 		int cnt = 0;
-		for(int i=0; i<height; i++) {
-			for(int j=0; j<width; j++) {
+		for(int i=1; i<=height; i++) {
+			for(int j=1; j<=width; j++) {
 				if(sq[i][j].isBomFlag() && sq[i][j].isUserFlaged()) {
 					cnt++;
 				}
 			}
 		}
-		return cnt == bomNum ? 1 : 0;
+		return (cnt == bomNum) ? 1 : 0;
 	}
 
 }
