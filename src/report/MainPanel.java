@@ -64,6 +64,15 @@ public class MainPanel extends JPanel implements Runnable{
 					}
 				}
 			}
+			int isEnd = ms.checkFinish();
+			if(isEnd == 1) {
+				g.setColor(Color.BLACK);
+				g.drawString("Game Clear!", boxSize * width, boxSize * (height + 2));
+			}
+			else if(isEnd == 2) {
+				g.setColor(Color.BLACK);
+				g.drawString("Game Over!", boxSize * 2, boxSize * (height + 2));
+			}
 		}
 		for(int i=1; i<=height; i++) {
 			for(int j=1; j<=width; j++) {
@@ -81,17 +90,13 @@ public class MainPanel extends JPanel implements Runnable{
 		public static final int BOTH_ON = 3;
 		public static final int NO_CHANGE = 0;
 
-		private boolean leftFlag;
-		private boolean rightFlag;
-		private boolean bothFlag;
+		private int mouseState = 0;
 
 		private int mx;
 		private int my;
 
 		MyMouseAdapter(){
-			leftFlag = false;
-			rightFlag = false;
-			bothFlag = false;
+			mouseState = NO_CHANGE;
 
 			mx = 0;
 			my = 0;
@@ -101,21 +106,17 @@ public class MainPanel extends JPanel implements Runnable{
 			System.out.println("Button Pressed");
 			int btn = e.getButton();
 			if(btn == MouseEvent.BUTTON1) {
-				if(rightFlag == true) {
-					leftFlag = false;
-					rightFlag = false;
-					bothFlag = true;
+				if(mouseState == RIGHT_ON) {
+					mouseState = BOTH_ON;
 				}else {
-					leftFlag = true;
+					mouseState = LEFT_ON;
 				}
 			}
 			else if(btn == MouseEvent.BUTTON3) {
-				if(leftFlag == true) {
-					leftFlag = false;
-					rightFlag = false;
-					bothFlag = true;
+				if(mouseState == LEFT_ON) {
+					mouseState = BOTH_ON;
 				}else {
-					rightFlag = true;
+					mouseState = RIGHT_ON;
 				}
 			}
 			return;
@@ -134,20 +135,20 @@ public class MainPanel extends JPanel implements Runnable{
 				return;
 			}
 			int btn = e.getButton();
-			if(bothFlag == true) {
+			if(mouseState == BOTH_ON) {
 				System.out.println("both on");
 				ms.openFull(mx / boxSize,  my / boxSize);
-				bothFlag = false;
+				mouseState = NO_CHANGE;
 			}
-			else if(btn == MouseEvent.BUTTON1 && leftFlag == true) {
+			else if(mouseState == LEFT_ON) {
 				System.out.println("pushed button1");
 				ms.open(mx / boxSize, my / boxSize);
-				leftFlag = false;
+				mouseState = NO_CHANGE;
 			}
-			else if(btn == MouseEvent.BUTTON3 && rightFlag == true) {
+			else if(mouseState == RIGHT_ON) {
 				System.out.println("pushed button3!");
 				ms.setFlag(mx / boxSize, my / boxSize);
-				rightFlag = false;
+				mouseState = NO_CHANGE;
 			}
 			return;
 		}
