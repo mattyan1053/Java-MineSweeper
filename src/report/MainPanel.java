@@ -11,9 +11,8 @@ public class MainPanel extends JPanel implements Runnable{
 
 	private Sweeper ms;
 	private MyMouseAdapter ml;
-	private Thread t;
-
 	private Status st;
+	private Thread t;
 
 	private int width;
 	private int height;
