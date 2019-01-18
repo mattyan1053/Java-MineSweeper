@@ -13,6 +13,8 @@ public class MainPanel extends JPanel implements Runnable{
 	private MyMouseAdapter ml;
 	private Thread t;
 
+	private Status st;
+
 	private int width;
 	private int height;
 	private int bomNum;
@@ -21,30 +23,42 @@ public class MainPanel extends JPanel implements Runnable{
 
 	public static final int BOX_SIZE = 20;
 
-	MainPanel(int width, int height, int bomNum, int left, int top){
+	MainPanel(int width, int height, int bomNum, int left, int top, int windowWidth, int windowHeight){
 		super();
 		this.startFlag = false;
 		this.width = width;
 		this.height = height;
 		this.bomNum = bomNum;
+
 		ms = new Sweeper(this.width, this.height, this.bomNum);
 		ml = new MyMouseAdapter();
+		st = new Status(0, this.height * BOX_SIZE, bomNum);
+
+		setLayout(null);
+		setBounds(left, top, Math.max(windowWidth, width*BOX_SIZE), this.height*BOX_SIZE + 100);
+		add(st);
 		this.addMouseListener(ml);
-		setBounds(left, top, width*BOX_SIZE, height*BOX_SIZE);
 
 		t = new Thread(this);
 		t.start();
 
 	}
 
+	@Override
 	public void run() {
 		while(true) {
 			repaint();
-			if(ms.checkFinish() != 0) break;
+			if(st.setFinishString(ms.checkFinish()) != 0) {
+				st.timerStop();
+				break;
+			}
+			st.setUnFlagedNum(ms.getUnFlagedNum());
 		}
 	}
 
+	@Override
 	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		for(int i=1; i<=height; i++) {
 			for(int j=1; j<=width; j++) {
 				Square s = ms.getSquare(j , i);
@@ -67,15 +81,6 @@ public class MainPanel extends JPanel implements Runnable{
 						g.drawString(String.valueOf(s.getBomNum()), (j - 1) * BOX_SIZE + BOX_SIZE / 3,  (i - 1) * BOX_SIZE + BOX_SIZE / 2);
 					}
 				}
-			}
-			int isEnd = ms.checkFinish();
-			if(isEnd == 1) {
-				g.setColor(Color.BLACK);
-				g.drawString("Game Clear!", BOX_SIZE * width, BOX_SIZE * (height + 2));
-			}
-			else if(isEnd == 2) {
-				g.setColor(Color.BLACK);
-				g.drawString("Game Over!", BOX_SIZE * 2, BOX_SIZE * (height + 2));
 			}
 		}
 		for(int i=0; i<height; i++) {
@@ -106,6 +111,7 @@ public class MainPanel extends JPanel implements Runnable{
 			my = 0;
 		}
 
+		@Override
 		public void mousePressed(MouseEvent e) {
 			System.out.println("Button Pressed");
 			int btn = e.getButton();
@@ -126,6 +132,7 @@ public class MainPanel extends JPanel implements Runnable{
 			return;
 		}
 
+		@Override
 		public void mouseReleased(MouseEvent e) {
 			System.out.println("Button Released");
 			mx = e.getX();
@@ -152,6 +159,7 @@ public class MainPanel extends JPanel implements Runnable{
 				if(startFlag == false) {
 					startFlag = true;
 					ms.initGame(mx / BOX_SIZE, my / BOX_SIZE);
+					st.timerStart();
 				}
 				ms.open(mx / BOX_SIZE, my / BOX_SIZE);
 				mouseState = NO_CHANGE;

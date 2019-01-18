@@ -9,9 +9,9 @@ public class Sweeper {
 
 	private int bomNum; // 爆弾数
 
-	private boolean gameOverFlag;
-
 	private Square[][] sq;
+
+	private int unFlagedNum;
 
 	Sweeper(int width, int height, int bomNum){
 		this.width = width;
@@ -19,7 +19,7 @@ public class Sweeper {
 
 		this.bomNum = bomNum;
 
-		this.gameOverFlag = false;
+		unFlagedNum = bomNum;
 
 		// マス目の設定、外側をダミーとして余分に取る
 		sq = new Square[this.height + 2][this.width + 2];
@@ -29,8 +29,6 @@ public class Sweeper {
 				sq[i][j] = new Square();
 			}
 		}
-
-		//initGame();
 
 	}
 
@@ -71,10 +69,7 @@ public class Sweeper {
 		if(sq[y][x].isOpen()) return;
 		if(sq[y][x].isUserFlaged()) return;
 		sq[y][x].setOpenFlag(true);
-		if(sq[y][x].isBomFlag()) {
-			this.gameOverFlag = true;
-			return;
-		}
+		if(sq[y][x].isBomFlag()) return;
 		if(sq[y][x].getBomNum() == 0) {
 			for(int i=-1; i<=1;i++) {
 				for(int j=-1;j<=1;j++) {
@@ -112,7 +107,13 @@ public class Sweeper {
 	public void setFlag(int x, int y) {
 		if(sq[y][x].isOpen()) return;
 		sq[y][x].setUserFlag(!sq[y][x].isUserFlaged());
+		if(sq[y][x].isUserFlaged()) unFlagedNum--;
+		else unFlagedNum++;
 		return;
+	}
+
+	public int getUnFlagedNum() {
+		return unFlagedNum;
 	}
 
 	public Square getSquare(int x, int y) {
@@ -121,16 +122,14 @@ public class Sweeper {
 
 	// ゲーム終了チェック 継続:0 クリアー:1 ゲームオーバー:2
 	public int checkFinish() {
-		if(gameOverFlag == true) return 2;
-		int cnt = 0;
+		int clearFlag = 1;
 		for(int i=1; i<=height; i++) {
 			for(int j=1; j<=width; j++) {
-				if(sq[i][j].isBomFlag() && sq[i][j].isUserFlaged()) {
-					cnt++;
-				}
+				if(sq[i][j].isBomFlag() && sq[i][j].isOpen()) return 2;
+				if(!sq[i][j].isBomFlag() && !sq[i][j].isOpen()) clearFlag = 0;
 			}
 		}
-		return (cnt == bomNum) ? 1 : 0;
+		return clearFlag;
 	}
 
 }

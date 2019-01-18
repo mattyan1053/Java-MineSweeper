@@ -30,7 +30,6 @@ public class MainWindow extends JFrame{
 
 		// ウィンドウの設定
 		setTitle(title);
-		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
@@ -76,10 +75,10 @@ public class MainWindow extends JFrame{
 		this.height = height;
 		this.bomNum = bomNum;
 		this.windowWidth = Math.max(BUTTON_WIDTH * buttonNum, width * MainPanel.BOX_SIZE + MARGIN_WIDTH);
-		this.windowHeight = BUTTON_HEIGHT + height * MainPanel.BOX_SIZE + MARGIN_HEIGHT;
+		this.windowHeight = BUTTON_HEIGHT + height * MainPanel.BOX_SIZE + MARGIN_HEIGHT + Status.S_HEIGHT;
 
 		setSize(windowWidth, windowHeight);
-		mainContent  = new MainPanel(this.width, this.height, this.bomNum, 0, BUTTON_HEIGHT);
+		mainContent  = new MainPanel(this.width, this.height, this.bomNum, left, top, windowWidth, windowHeight);
 		content.add(mainContent);
 	}
 
