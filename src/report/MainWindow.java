@@ -8,7 +8,6 @@ import javax.swing.JFrame;
 public class MainWindow extends JFrame{
 
 	private Container content;
-
 	private MainPanel mainContent;
 
 	private int width;
@@ -18,80 +17,70 @@ public class MainWindow extends JFrame{
 	private int windowWidth;
 	private int windowHeight;
 
-	private static final int buttonWidth = 100;
-	private static final int buttonHeight = 30;
+	private int buttonNum;
+	public static final int BUTTON_WIDTH = 100;
+	public static final int BUTTON_HEIGHT = 30;
 
-	MainWindow(String title, int width, int height, int bomNum){
+	public static final int MARGIN_WIDTH = 8;
+	public static final int MARGIN_HEIGHT = 30;
+
+	private JButton[] button;
+
+	MainWindow(String title){
+
+		// ウィンドウの設定
 		setTitle(title);
-
-		this.width = width;
-		this.height = height;
-		this.bomNum = bomNum;
-		this.windowWidth = (width + 2) * MainPanel.BOX_SIZE;
-		this.windowHeight = 50 + (height + 2) * MainPanel.BOX_SIZE;
-
-		setSize(windowWidth, windowHeight);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
-
-		content = getContentPane();
-		mainContent = new MainPanel(width, height, bomNum, 0, buttonHeight);
-
-		JButton button1010 = new JButton("10×10");
-		button1010.setBounds(0 ,0 ,buttonWidth ,buttonHeight);
-		button1010.addActionListener(e -> {
-			System.out.println("Changed 1010");
-			this.width = 10;
-			this.height = 10;
-			this.bomNum = 10;
-			this.windowWidth = (this.width + 2) * MainPanel.BOX_SIZE;
-			this.windowHeight = 50 + (this.height + 2) * MainPanel.BOX_SIZE;
-
-			setSize(windowWidth, windowHeight);
-			content.remove(mainContent);
-			mainContent  = new MainPanel(this.width, this.height, this.bomNum, 0, buttonHeight);
-			content.add(mainContent);
-		});
-		JButton button2030 = new JButton("20×30");
-		button2030.setBounds(buttonWidth, 0, buttonWidth, buttonHeight);
-		button2030.addActionListener(e -> {
-			System.out.println("Changed 2030");
-			this.width = 30;
-			this.height = 20;
-			this.bomNum = 60;
-			this.windowWidth = (this.width + 2) * MainPanel.BOX_SIZE;
-			this.windowHeight = 50 + (this.height + 2) * MainPanel.BOX_SIZE;
-
-			setSize(windowWidth, windowHeight);
-			content.remove(mainContent);
-			mainContent  = new MainPanel(this.width, this.height, this.bomNum, 0, buttonHeight);
-			content.add(mainContent);
-		});
-		JButton button4060 = new JButton("40×60");
-		button4060.setBounds(buttonWidth * 2, 0, buttonWidth, buttonHeight);
-		button4060.addActionListener(e -> {
-			System.out.println("Changed 4060");
-			this.width = 60;
-			this.height = 40;
-			this.bomNum = 240;
-			this.windowWidth = (this.width + 2) * MainPanel.BOX_SIZE;
-			this.windowHeight = 50 + (this.height + 2) * MainPanel.BOX_SIZE;
-
-			setSize(windowWidth, windowHeight);
-			content.remove(mainContent);
-			mainContent  = new MainPanel(this.width, this.height, this.bomNum, 0, buttonHeight);
-			content.add(mainContent);
-		});
-
-		content.setLayout(null);
-		content.add(button1010);
-		content.add(button2030);
-		content.add(button4060);
-		content.add(mainContent);
-
 		setVisible(true);
+		content = getContentPane();
+		content.setLayout(null);
 
+		// ボタン生成
+		buttonNum = 3;
+		button = new JButton[buttonNum];
+
+		// 各ボタンの設定(名称及び押下時の動作)
+		button[0] = new JButton("10×10");
+		button[0].addActionListener(e -> {
+			System.out.println("Changed 1010");
+			content.remove(mainContent);
+			makeMainPanel(10, 10, 10, 0, BUTTON_HEIGHT);
+		});
+		button[1] = new JButton("20×30");
+		button[1].addActionListener(e -> {
+			System.out.println("Changed 2030");
+			content.remove(mainContent);
+			makeMainPanel(30, 20, 60, 0, BUTTON_HEIGHT);
+		});
+		button[2] = new JButton("40×60");
+		button[2].addActionListener(e -> {
+			System.out.println("Changed 4060");
+			content.remove(mainContent);
+			makeMainPanel(60, 40, 240, 0, BUTTON_HEIGHT);
+		});
+
+		// ボタンの配置
+		for(int i = 0; i < buttonNum; i++) {
+			button[i].setBounds(BUTTON_WIDTH * i, 0, BUTTON_WIDTH, BUTTON_HEIGHT);
+			content.add(button[i]);
+		}
+
+		makeMainPanel(10, 10, 10, 0, BUTTON_HEIGHT);
+
+	}
+
+	private void makeMainPanel(int width, int height, int bomNum, int left, int top) {
+		this.width = width;
+		this.height = height;
+		this.bomNum = bomNum;
+		this.windowWidth = Math.max(BUTTON_WIDTH * buttonNum, width * MainPanel.BOX_SIZE + MARGIN_WIDTH);
+		this.windowHeight = BUTTON_HEIGHT + height * MainPanel.BOX_SIZE + MARGIN_HEIGHT;
+
+		setSize(windowWidth, windowHeight);
+		mainContent  = new MainPanel(this.width, this.height, this.bomNum, 0, BUTTON_HEIGHT);
+		content.add(mainContent);
 	}
 
 }

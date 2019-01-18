@@ -17,17 +17,20 @@ public class MainPanel extends JPanel implements Runnable{
 	private int height;
 	private int bomNum;
 
+	private boolean startFlag;
+
 	public static final int BOX_SIZE = 20;
 
 	MainPanel(int width, int height, int bomNum, int left, int top){
 		super();
+		this.startFlag = false;
 		this.width = width;
 		this.height = height;
 		this.bomNum = bomNum;
 		ms = new Sweeper(this.width, this.height, this.bomNum);
 		ml = new MyMouseAdapter();
 		this.addMouseListener(ml);
-		setBounds(left,top,width*BOX_SIZE, height*BOX_SIZE);
+		setBounds(left, top, width*BOX_SIZE, height*BOX_SIZE);
 
 		t = new Thread(this);
 		t.start();
@@ -146,6 +149,10 @@ public class MainPanel extends JPanel implements Runnable{
 			}
 			else if(mouseState == LEFT_ON) {
 				System.out.println("pushed button1");
+				if(startFlag == false) {
+					startFlag = true;
+					ms.initGame(mx / BOX_SIZE, my / BOX_SIZE);
+				}
 				ms.open(mx / BOX_SIZE, my / BOX_SIZE);
 				mouseState = NO_CHANGE;
 			}

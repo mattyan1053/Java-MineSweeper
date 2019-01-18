@@ -30,18 +30,19 @@ public class Sweeper {
 			}
 		}
 
-		initGame();
+		//initGame();
 
 	}
 
 	// ゲームの初期化
-	private void initGame() {
+	public void initGame(int _x, int _y) {
 		Random r = new Random();
 		for(int bom = bomNum; bom > 0; bom--) {
 			boolean breakFlag = false;
 			while(!breakFlag) {
 				int x = r.nextInt(width) + 1;
 				int y = r.nextInt(height) + 1;
+				if(x == _x && y == _y) continue;
 				System.out.println(y + " " + x);
 				breakFlag = (sq[y][x].setBomFlag(true) == 0);
 			}
