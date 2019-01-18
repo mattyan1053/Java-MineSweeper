@@ -17,9 +17,9 @@ public class MainPanel extends JPanel implements Runnable{
 	private int height;
 	private int bomNum;
 
-	private final int boxSize = 30;
+	public static final int BOX_SIZE = 20;
 
-	MainPanel(int width, int height, int bomNum){
+	MainPanel(int width, int height, int bomNum, int left, int top){
 		super();
 		this.width = width;
 		this.height = height;
@@ -27,6 +27,7 @@ public class MainPanel extends JPanel implements Runnable{
 		ms = new Sweeper(this.width, this.height, this.bomNum);
 		ml = new MyMouseAdapter();
 		this.addMouseListener(ml);
+		setBounds(left,top,width*BOX_SIZE, height*BOX_SIZE);
 
 		t = new Thread(this);
 		t.start();
@@ -46,39 +47,39 @@ public class MainPanel extends JPanel implements Runnable{
 				Square s = ms.getSquare(j , i);
 				if(s.isUserFlaged()){
 					g.setColor(Color.RED);
-					g.fillRect(j * boxSize, i * boxSize, boxSize, boxSize);
+					g.fillRect((j - 1) * BOX_SIZE, (i - 1) * BOX_SIZE, BOX_SIZE, BOX_SIZE);
 				}
 				else if(!s.isOpen()) {
 					g.setColor(Color.gray);
-					g.fillRect(j * boxSize, i * boxSize, boxSize, boxSize);
+					g.fillRect((j - 1) * BOX_SIZE, (i - 1) * BOX_SIZE, BOX_SIZE, BOX_SIZE);
 				}else {
 					g.setColor(Color.DARK_GRAY);
-					g.fillRect(j * boxSize, i * boxSize, boxSize, boxSize);
+					g.fillRect((j - 1) * BOX_SIZE, (i - 1) * BOX_SIZE, BOX_SIZE, BOX_SIZE);
 					if(s.isBomFlag()) {
 						g.setColor(Color.BLACK);
-						g.drawString("●", j * boxSize + boxSize / 3,  i * boxSize + boxSize / 2);
+						g.drawString("●", (j - 1) * BOX_SIZE + BOX_SIZE / 3,  (i - 1) * BOX_SIZE + BOX_SIZE / 2);
 					}
 					else if(s.getBomNum() != 0) {
 						g.setColor(Color.WHITE);
-						g.drawString(String.valueOf(s.getBomNum()), j * boxSize + boxSize / 3,  i * boxSize + boxSize / 2);
+						g.drawString(String.valueOf(s.getBomNum()), (j - 1) * BOX_SIZE + BOX_SIZE / 3,  (i - 1) * BOX_SIZE + BOX_SIZE / 2);
 					}
 				}
 			}
 			int isEnd = ms.checkFinish();
 			if(isEnd == 1) {
 				g.setColor(Color.BLACK);
-				g.drawString("Game Clear!", boxSize * width, boxSize * (height + 2));
+				g.drawString("Game Clear!", BOX_SIZE * width, BOX_SIZE * (height + 2));
 			}
 			else if(isEnd == 2) {
 				g.setColor(Color.BLACK);
-				g.drawString("Game Over!", boxSize * 2, boxSize * (height + 2));
+				g.drawString("Game Over!", BOX_SIZE * 2, BOX_SIZE * (height + 2));
 			}
 		}
-		for(int i=1; i<=height; i++) {
-			for(int j=1; j<=width; j++) {
+		for(int i=0; i<height; i++) {
+			for(int j=0; j<width; j++) {
 				g.setColor(Color.BLACK);
-				g.drawLine(j * boxSize, i * boxSize, j * boxSize, (i + 1) * boxSize);
-				g.drawLine(j * boxSize, i * boxSize, (j + 1) * boxSize, i * boxSize);
+				g.drawLine(j * BOX_SIZE, i * BOX_SIZE, j * BOX_SIZE, (i + 1) * BOX_SIZE);
+				g.drawLine(j * BOX_SIZE, i * BOX_SIZE, (j + 1) * BOX_SIZE, i * BOX_SIZE);
 			}
 		}
 	}
@@ -126,28 +127,31 @@ public class MainPanel extends JPanel implements Runnable{
 			System.out.println("Button Released");
 			mx = e.getX();
 			my = e.getY();
-			if(mx < boxSize || mx > boxSize * (width + 1)) {
+			// ます番号が1~width、2~heightなので調整
+			mx += BOX_SIZE;
+			my += BOX_SIZE;
+
+			if(mx < BOX_SIZE || mx > BOX_SIZE * (width + 1)) {
 				System.out.println("Over X");
 				return;
 			}
-			if(my < boxSize || my > boxSize * (height + 1)) {
+			if(my < BOX_SIZE || my > BOX_SIZE * (height + 1)) {
 				System.out.println("Over Y");
 				return;
 			}
-			int btn = e.getButton();
 			if(mouseState == BOTH_ON) {
 				System.out.println("both on");
-				ms.openFull(mx / boxSize,  my / boxSize);
+				ms.openFull(mx / BOX_SIZE,  my / BOX_SIZE);
 				mouseState = NO_CHANGE;
 			}
 			else if(mouseState == LEFT_ON) {
 				System.out.println("pushed button1");
-				ms.open(mx / boxSize, my / boxSize);
+				ms.open(mx / BOX_SIZE, my / BOX_SIZE);
 				mouseState = NO_CHANGE;
 			}
 			else if(mouseState == RIGHT_ON) {
 				System.out.println("pushed button3!");
-				ms.setFlag(mx / boxSize, my / boxSize);
+				ms.setFlag(mx / BOX_SIZE, my / BOX_SIZE);
 				mouseState = NO_CHANGE;
 			}
 			return;

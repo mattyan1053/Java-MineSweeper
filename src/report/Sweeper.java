@@ -4,12 +4,12 @@ import java.util.Random;
 
 public class Sweeper {
 
-	private int width; // 横幅
-	private int height; // 縦幅
+	private int width;
+	private int height;
 
 	private int bomNum; // 爆弾数
 
-	private boolean endFlag; // ゲーム終了フラグ
+	private boolean gameOverFlag;
 
 	private Square[][] sq;
 
@@ -19,13 +19,13 @@ public class Sweeper {
 
 		this.bomNum = bomNum;
 
-		this.endFlag = false;
+		this.gameOverFlag = false;
 
 		// マス目の設定、外側をダミーとして余分に取る
 		sq = new Square[this.height + 2][this.width + 2];
 
 		for(int i=0; i<sq.length; i++) {
-			for(int j=0; j<sq.length; j++) {
+			for(int j=0; j<sq[i].length; j++) {
 				sq[i][j] = new Square();
 			}
 		}
@@ -42,7 +42,7 @@ public class Sweeper {
 			while(!breakFlag) {
 				int x = r.nextInt(width) + 1;
 				int y = r.nextInt(height) + 1;
-				System.out.println();
+				System.out.println(y + " " + x);
 				breakFlag = (sq[y][x].setBomFlag(true) == 0);
 			}
 		}
@@ -71,7 +71,7 @@ public class Sweeper {
 		if(sq[y][x].isUserFlaged()) return;
 		sq[y][x].setOpenFlag(true);
 		if(sq[y][x].isBomFlag()) {
-			this.endFlag = true;
+			this.gameOverFlag = true;
 			return;
 		}
 		if(sq[y][x].getBomNum() == 0) {
@@ -120,7 +120,7 @@ public class Sweeper {
 
 	// ゲーム終了チェック 継続:0 クリアー:1 ゲームオーバー:2
 	public int checkFinish() {
-		if(endFlag == true) return 2;
+		if(gameOverFlag == true) return 2;
 		int cnt = 0;
 		for(int i=1; i<=height; i++) {
 			for(int j=1; j<=width; j++) {

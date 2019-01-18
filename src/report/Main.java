@@ -3,6 +3,6 @@ package report;
 public class Main {
 
 	public static void main(String[] args) {
-		MainWindow MW = new MainWindow("Test Window", 600, 640);
+		MainWindow mw = new MainWindow("MineSweeper", 10, 10, 10);
 	}
 }
