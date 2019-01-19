@@ -117,10 +117,6 @@ public class MainWindow extends JFrame{
 	// 'R'を離す入力のみ判定する
 	public class MyKeyAdapter extends KeyAdapter {
 
-		public MyKeyAdapter(){
-			System.out.println("Called Constructer of KeyAdapter");
-		}
-
 		// キー押下時インスタンスの再生成
 		@Override
 		public void keyPressed(KeyEvent e) {
