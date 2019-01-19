@@ -119,7 +119,7 @@ public class MainWindow extends JFrame{
 
 		// キー押下時インスタンスの再生成
 		@Override
-		public void keyPressed(KeyEvent e) {
+		public void keyReleased(KeyEvent e) {
 			if(e.getKeyCode() == KeyEvent.VK_R) {
 				content.remove(mainContent);
 				makeMainPanel(widthNum, heightNum, bomNum, left, top);
