@@ -5,31 +5,32 @@ import java.awt.Container;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+/*
+ * アプリケーションのウィンドウを生成するクラス
+ * 中にボタンやゲーム本体のパネルなどを配置している
+ */
 public class MainWindow extends JFrame{
 
-	private Container content;
-	private MainPanel mainContent;
-
-	private int width;
-	private int height;
-	private int bomNum;
+	// フレーム外枠サイズ
+	public static final int MARGIN_WIDTH = 8;
+	public static final int MARGIN_HEIGHT = 30;
 
 	private int windowWidth;
 	private int windowHeight;
 
+	private Container content;
+	private MainPanel mainContent;
+
+	// ボタン情報
 	private int buttonNum;
+	private JButton[] button;
 	public static final int BUTTON_WIDTH = 100;
 	public static final int BUTTON_HEIGHT = 30;
 
-	public static final int MARGIN_WIDTH = 8;
-	public static final int MARGIN_HEIGHT = 30;
-
-	private JButton[] button;
-
-	MainWindow(String title){
+	MainWindow(String _title){
 
 		// ウィンドウの設定
-		setTitle(title);
+		setTitle(_title);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
@@ -41,21 +42,27 @@ public class MainWindow extends JFrame{
 		button = new JButton[buttonNum];
 
 		// 各ボタンの設定(名称及び押下時の動作)
+		/*
+		 * ボタンインスタンスの生成とアクションリスナーの設定が必要
+		 * テンプレート
+		 * button[i] = new JButton("テキスト");
+		 * button[i].addActionListener(e -> {
+		 *		content.remove(mainContent);
+		 *		makeMainPanel(widthNum, heightNum, bomNum, left, top);
+		 * });
+		 */
 		button[0] = new JButton("10×10");
 		button[0].addActionListener(e -> {
-			System.out.println("Changed 1010");
 			content.remove(mainContent);
 			makeMainPanel(10, 10, 10, 0, BUTTON_HEIGHT);
 		});
 		button[1] = new JButton("20×30");
 		button[1].addActionListener(e -> {
-			System.out.println("Changed 2030");
 			content.remove(mainContent);
 			makeMainPanel(30, 20, 60, 0, BUTTON_HEIGHT);
 		});
 		button[2] = new JButton("40×60");
 		button[2].addActionListener(e -> {
-			System.out.println("Changed 4060");
 			content.remove(mainContent);
 			makeMainPanel(60, 40, 240, 0, BUTTON_HEIGHT);
 		});
@@ -66,20 +73,24 @@ public class MainWindow extends JFrame{
 			content.add(button[i]);
 		}
 
+		// 初期ゲームパネル
 		makeMainPanel(10, 10, 10, 0, BUTTON_HEIGHT);
 
 	}
 
-	private void makeMainPanel(int width, int height, int bomNum, int left, int top) {
-		this.width = width;
-		this.height = height;
-		this.bomNum = bomNum;
-		this.windowWidth = Math.max(BUTTON_WIDTH * buttonNum, width * MainPanel.BOX_SIZE + MARGIN_WIDTH);
-		this.windowHeight = BUTTON_HEIGHT + height * MainPanel.BOX_SIZE + MARGIN_HEIGHT + Status.S_HEIGHT;
+	// ゲームパネル生成
+	// 引数：横マス数、縦マス数、爆弾数、左上x座標、左上y座標
+	private void makeMainPanel(int widthNum, int heightNum, int bomNum, int left, int top) {
 
+		// ウィンドウのリサイズ
+		windowWidth = Math.max(BUTTON_WIDTH * buttonNum, widthNum * MainPanel.BOX_SIZE + MARGIN_WIDTH);
+		windowHeight = BUTTON_HEIGHT + heightNum * MainPanel.BOX_SIZE + MARGIN_HEIGHT + Status.S_HEIGHT;
 		setSize(windowWidth, windowHeight);
-		mainContent  = new MainPanel(this.width, this.height, this.bomNum, left, top, windowWidth, windowHeight);
+
+		// ゲームパネル生成
+		mainContent  = new MainPanel(widthNum, heightNum, bomNum, left, top, windowWidth, windowHeight);
 		content.add(mainContent);
+
 	}
 
 }

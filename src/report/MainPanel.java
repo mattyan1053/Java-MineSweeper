@@ -1,182 +1,212 @@
 package report;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+/*
+ * ゲーム画面クラス
+ * 描画処理と内部処理は別スレッドで行う
+ * Sweeperインスタンスから読み取った情報を実際に描画していく
+ */
 public class MainPanel extends JPanel implements Runnable{
 
-	private Sweeper ms;
-	private MyMouseAdapter ml;
-	private Status st;
+	public static final int BOX_SIZE = 20;
+	public static final int IMAGE_TIPS_SIZE = 20;
+
+	// パネルに含むインスタンス群
+	private Sweeper gameUnit;
+	private MyMouseAdapter mouseAdpt;
+	private Status status;
 	private Thread t;
 
-	private int width;
-	private int height;
-	private int bomNum;
+	// 画像ハンドラ
+	private BufferedImage img;
+
+	// ゲーム本体の情報
+	private int widthNum;
+	private int heightNum;
 
 	private boolean startFlag;
 
-	public static final int BOX_SIZE = 20;
-
-	MainPanel(int width, int height, int bomNum, int left, int top, int windowWidth, int windowHeight){
+	// 引数：横マスの数, 縦マスの数, 爆弾の個数, パネル位置x座標, パネル位置y座標, 親フレームのxサイズ, 親フレームのyサイズ
+	MainPanel(int _widthNum, int _heightNum, int bomNum, int left, int top, int windowWidth, int windowHeight){
 		super();
-		this.startFlag = false;
-		this.width = width;
-		this.height = height;
-		this.bomNum = bomNum;
 
-		ms = new Sweeper(this.width, this.height, this.bomNum);
-		ml = new MyMouseAdapter();
-		st = new Status(0, this.height * BOX_SIZE, bomNum);
+		// 初期化
+		startFlag = false;
+		widthNum = _widthNum;
+		heightNum = _heightNum;
 
+		gameUnit = new Sweeper(widthNum, heightNum, bomNum);
+		mouseAdpt = new MyMouseAdapter();
+		status = new Status(0, heightNum * BOX_SIZE, bomNum);
+
+		try {
+			img = ImageIO.read(new File("./src/report/box.bmp"));
+		} catch (IOException e) {
+			System.err.println("Failed to Load Image File.");
+			e.printStackTrace();
+		}
+
+		// レイアウト
 		setLayout(null);
-		setBounds(left, top, Math.max(windowWidth, width*BOX_SIZE), this.height*BOX_SIZE + 100);
-		add(st);
-		this.addMouseListener(ml);
+		setBounds(left, top, Math.max(windowWidth, widthNum * BOX_SIZE), heightNum * BOX_SIZE + Status.S_HEIGHT);
+		add(status);
+		addMouseListener(mouseAdpt);
 
+		// スレッド操作
 		t = new Thread(this);
 		t.start();
 
 	}
 
+	// 本体の描画及びステータス欄の処理
 	@Override
 	public void run() {
 		while(true) {
+
 			repaint();
-			if(st.setFinishString(ms.checkFinish()) != 0) {
-				st.timerStop();
+
+			// フラグ数をステータス欄に反映
+			status.setUnFlagedNum(gameUnit.getUnFlagedNum());
+
+			// ゲーム終了ならステータス欄を変更して離脱
+			if(status.setFinishString(gameUnit.checkFinish()) != 0) {
+				status.timerStop();
 				break;
 			}
-			st.setUnFlagedNum(ms.getUnFlagedNum());
 		}
 	}
 
+	// ゲーム本体描画部分
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		for(int i=1; i<=height; i++) {
-			for(int j=1; j<=width; j++) {
-				Square s = ms.getSquare(j , i);
+
+		for(int y=1; y<=heightNum; y++) {
+			for(int x=1; x<=widthNum; x++) {
+				Square s = gameUnit.getSquare(x , y);
+				// マスの描画開始位置(destination)
+				int dx = (x - 1) * BOX_SIZE;
+				int dy = (y - 1) * BOX_SIZE;
+
+				// 各マスの描画処理
 				if(s.isUserFlaged()){
-					g.setColor(Color.RED);
-					g.fillRect((j - 1) * BOX_SIZE, (i - 1) * BOX_SIZE, BOX_SIZE, BOX_SIZE);
+					g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * 2, 0, IMAGE_TIPS_SIZE * 3, IMAGE_TIPS_SIZE, this);
 				}
 				else if(!s.isOpen()) {
-					g.setColor(Color.gray);
-					g.fillRect((j - 1) * BOX_SIZE, (i - 1) * BOX_SIZE, BOX_SIZE, BOX_SIZE);
-				}else {
-					g.setColor(Color.DARK_GRAY);
-					g.fillRect((j - 1) * BOX_SIZE, (i - 1) * BOX_SIZE, BOX_SIZE, BOX_SIZE);
+					g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, 0, 0, IMAGE_TIPS_SIZE, IMAGE_TIPS_SIZE, this);
+				}
+				else {
 					if(s.isBomFlag()) {
-						g.setColor(Color.BLACK);
-						g.drawString("●", (j - 1) * BOX_SIZE + BOX_SIZE / 3,  (i - 1) * BOX_SIZE + BOX_SIZE / 2);
+						g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * 3, 0, IMAGE_TIPS_SIZE * 4, IMAGE_TIPS_SIZE, this);
 					}
-					else if(s.getBomNum() != 0) {
-						g.setColor(Color.WHITE);
-						g.drawString(String.valueOf(s.getBomNum()), (j - 1) * BOX_SIZE + BOX_SIZE / 3,  (i - 1) * BOX_SIZE + BOX_SIZE / 2);
+					else {
+						// まわりの爆弾の数にあわせて数字の画像を表示
+						int bNum = s.getBomNum();
+						if(bNum == 0) {
+							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE, 0, IMAGE_TIPS_SIZE * 2, IMAGE_TIPS_SIZE, this);
+						}
+						else if(bNum <= 4) {
+							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * (bNum - 1), IMAGE_TIPS_SIZE, IMAGE_TIPS_SIZE * bNum, IMAGE_TIPS_SIZE * 2, this);
+						}
+						else {
+							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * (bNum - 5), IMAGE_TIPS_SIZE * 2, IMAGE_TIPS_SIZE * (bNum - 4), IMAGE_TIPS_SIZE * 3, this);
+						}
 					}
 				}
-			}
-		}
-		for(int i=0; i<height; i++) {
-			for(int j=0; j<width; j++) {
-				g.setColor(Color.BLACK);
-				g.drawLine(j * BOX_SIZE, i * BOX_SIZE, j * BOX_SIZE, (i + 1) * BOX_SIZE);
-				g.drawLine(j * BOX_SIZE, i * BOX_SIZE, (j + 1) * BOX_SIZE, i * BOX_SIZE);
 			}
 		}
 	}
 
+	// MainPanelクラスのメンバ変数を扱うためインナークラスとした
+	// 右クリック、左クリック、同時クリックの３種類について処理
 	public class MyMouseAdapter extends MouseAdapter{
 
+		// マウスの状態
+		private int mouseState;
 		public static final int LEFT_ON = 1;
 		public static final int RIGHT_ON = 2;
 		public static final int BOTH_ON = 3;
 		public static final int NO_CHANGE = 0;
 
-		private int mouseState = 0;
-
 		private int mx;
 		private int my;
 
 		MyMouseAdapter(){
+			// 初期化
 			mouseState = NO_CHANGE;
-
 			mx = 0;
 			my = 0;
 		}
 
+		// マウスボタン押下時の処理
+		// どのボタンが押下されているかをmouseStateに保持
 		@Override
 		public void mousePressed(MouseEvent e) {
-			System.out.println("Button Pressed");
+
 			int btn = e.getButton();
+
+			// 押下ボタンをチェックして処理。すでに左右どちらかのボタンが押されていれば同時押しと判定
+			// 左ボタン(=BUTTON1)
 			if(btn == MouseEvent.BUTTON1) {
-				if(mouseState == RIGHT_ON) {
-					mouseState = BOTH_ON;
-				}else {
-					mouseState = LEFT_ON;
-				}
+				if(mouseState == RIGHT_ON) mouseState = BOTH_ON;
+				else mouseState = LEFT_ON;
 			}
+			// 右ボタン(=BUTTON3)
 			else if(btn == MouseEvent.BUTTON3) {
-				if(mouseState == LEFT_ON) {
-					mouseState = BOTH_ON;
-				}else {
-					mouseState = RIGHT_ON;
-				}
+				if(mouseState == LEFT_ON) mouseState = BOTH_ON;
+				else mouseState = RIGHT_ON;
 			}
+
 			return;
 		}
 
+		// ボタンが離されたとき、mouseStateの状態に応じてゲーム処理
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			System.out.println("Button Released");
+
 			mx = e.getX();
 			my = e.getY();
-			// ます番号が1~width、2~heightなので調整
+
+			// マスの番号が1~widthNum、1~heightNumなので調整
 			mx += BOX_SIZE;
 			my += BOX_SIZE;
 
-			if(mx < BOX_SIZE || mx > BOX_SIZE * (width + 1)) {
-				System.out.println("Over X");
-				return;
-			}
-			if(my < BOX_SIZE || my > BOX_SIZE * (height + 1)) {
-				System.out.println("Over Y");
-				return;
-			}
-			if(mouseState == BOTH_ON) {
-				System.out.println("both on");
-				ms.openFull(mx / BOX_SIZE,  my / BOX_SIZE);
-				mouseState = NO_CHANGE;
-			}
-			else if(mouseState == LEFT_ON) {
-				System.out.println("pushed button1");
-				if(startFlag == false) {
-					startFlag = true;
-					ms.initGame(mx / BOX_SIZE, my / BOX_SIZE);
-					st.timerStart();
+			// ゲーム画面外
+			if(mx < BOX_SIZE || mx > BOX_SIZE * (widthNum + 1)) return;
+			if(my < BOX_SIZE || my > BOX_SIZE * (heightNum + 1)) return;
+
+			// 各種処理
+			if(startFlag) {
+				if(mouseState == LEFT_ON) {
+					gameUnit.open(mx / BOX_SIZE, my / BOX_SIZE);
 				}
-				ms.open(mx / BOX_SIZE, my / BOX_SIZE);
-				mouseState = NO_CHANGE;
+				else if(mouseState == RIGHT_ON) {
+					gameUnit.setFlag(mx / BOX_SIZE, my / BOX_SIZE);
+				}
+				else if(mouseState == BOTH_ON) {
+					gameUnit.openFull(mx / BOX_SIZE,  my / BOX_SIZE);
+				}
 			}
-			else if(mouseState == RIGHT_ON) {
-				System.out.println("pushed button3!");
-				ms.setFlag(mx / BOX_SIZE, my / BOX_SIZE);
-				mouseState = NO_CHANGE;
+			// 最初の左クリック時ゲーム開始
+			else if(mouseState == LEFT_ON){
+				startFlag = true;
+				gameUnit.initGame(mx / BOX_SIZE, my / BOX_SIZE);
+				status.timerStart();
+				gameUnit.open(mx / BOX_SIZE, my / BOX_SIZE);
 			}
+
+			mouseState = NO_CHANGE;
+
 			return;
-		}
-
-		public int getMouseX() {
-			return mx;
-		}
-
-		public int getMouseY() {
-			return my;
 		}
 
 	}

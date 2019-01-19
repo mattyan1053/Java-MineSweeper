@@ -2,60 +2,72 @@ package report;
 
 import java.util.Random;
 
+/*
+ * ゲーム本体の内部処理を行っているクラス
+ */
 public class Sweeper {
 
-	private int width;
-	private int height;
-
-	private int bomNum; // 爆弾数
+	// ゲーム情報
+	private int widthNum;
+	private int heightNum;
+	private int bomNum;
 
 	private Square[][] sq;
 
+	// 爆弾数ーフラグ数
 	private int unFlagedNum;
 
-	Sweeper(int width, int height, int bomNum){
-		this.width = width;
-		this.height = height;
+	Sweeper(int _widthNum, int _heightNum, int _bomNum){
 
-		this.bomNum = bomNum;
-
+		widthNum = _widthNum;
+		heightNum = _heightNum;
+		bomNum = _bomNum;
 		unFlagedNum = bomNum;
 
-		// マス目の設定、外側をダミーとして余分に取る
-		sq = new Square[this.height + 2][this.width + 2];
-
-		for(int i=0; i<sq.length; i++) {
-			for(int j=0; j<sq[i].length; j++) {
-				sq[i][j] = new Square();
+		// マス目の初期化、外側をダミーとして余分に取る
+		sq = new Square[heightNum + 2][widthNum + 2];
+		for(int y=0; y<sq.length; y++) {
+			for(int x=0; x<sq[y].length; x++) {
+				sq[y][x] = new Square();
 			}
 		}
 
 	}
 
 	// ゲームの初期化
-	public void initGame(int _x, int _y) {
+	// 爆弾を配置し、周りの爆弾数を記憶する
+	// 引数：最初に開けるマス（fx, fy）
+	public void initGame(int fx, int fy) {
 		Random r = new Random();
+
+		// 爆弾の配置
 		for(int bom = bomNum; bom > 0; bom--) {
 			boolean breakFlag = false;
 			while(!breakFlag) {
-				int x = r.nextInt(width) + 1;
-				int y = r.nextInt(height) + 1;
-				if(x == _x && y == _y) continue;
-				System.out.println(y + " " + x);
+				int x = r.nextInt(widthNum) + 1;
+				int y = r.nextInt(heightNum) + 1;
+				// 初期マスなので爆弾配置から除外
+				if(x == fx && y == fy) continue;
+				// まだ爆弾が置かれていないマスであれば爆弾を置いて次のループへ
 				breakFlag = (sq[y][x].setBomFlag(true) == 0);
 			}
 		}
-		for(int i=1; i<=height; i++) {
-			for(int j=1; j<=width; j++) {
-				sq[i][j].setBomNum(countBom(j, i));
+
+		// 各マスの周りの爆弾数を記憶
+		for(int y=1; y<=heightNum; y++) {
+			for(int x=1; x<=widthNum; x++) {
+				sq[y][x].setBomNum(countBom(x, y));
 			}
 		}
 	}
 
+	// 座標(x, y)のマスの周りの爆弾数をカウント
+	// 引数：マスの座標(x, y)
 	private int countBom(int x, int y) {
 		int bomNum = 0;
 		for(int i=(-1); i<=1;i++) {
 			for(int j=(-1);j<=1;j++) {
+				// (x, y)指定されたマス自身はカウントしない
 				if(i == 0 && j == 0) continue;
 				if(sq[y + i][x + j].isBomFlag()) bomNum++;
 			}
@@ -63,28 +75,35 @@ public class Sweeper {
 		return bomNum;
 	}
 
-	// ますを開ける
+	// 座標(x, y)のマスを開ける
+	// 引数：マスの座標（x, y）
 	public void open(int x, int y) {
-		if(x < 1 || x > width || y < 1 || y > height) return;
-		if(sq[y][x].isOpen()) return;
-		if(sq[y][x].isUserFlaged()) return;
+		// ゲーム画面外ならなにもしない
+		if(x < 1 || x > widthNum || y < 1 || y > heightNum) return;
+
+		// あけることのできないマス（すでに開いているor爆弾フラグがたっている）ならなにもしない
+		if(sq[y][x].isOpen() || sq[y][x].isUserFlaged()) return;
+
 		sq[y][x].setOpenFlag(true);
-		if(sq[y][x].isBomFlag()) return;
-		if(sq[y][x].getBomNum() == 0) {
+
+		// あけたマスの周りに爆弾がなく、爆弾でもなければ周りのマスも開ける
+		if(sq[y][x].getBomNum() == 0 && !sq[y][x].isBomFlag()) {
 			for(int i=-1; i<=1;i++) {
 				for(int j=-1;j<=1;j++) {
-					if(i == 0 && j == 0) continue;
 					open(x + j, y + i);
 				}
 			}
 		}
+
 		return;
 	}
 
 	// フラグの数と周りの爆弾の数が一致しているときまとめて周り８マスをオープン
 	public void openFull(int x, int y) {
+		// 開いていないマスならなにもしない
 		if(!sq[y][x].isOpen()) return;
-		if(sq[y][x].getBomNum() == 0) return;
+
+		// 周りのフラグ数を数える
 		int cnt = 0;
 		for(int i=-1; i<=1;i++) {
 			for(int j=-1;j<=1;j++) {
@@ -92,44 +111,58 @@ public class Sweeper {
 				if(sq[y + i][x + j].isUserFlaged()) cnt++;
 			}
 		}
+
+		// フラグ数と爆弾数が一致していれば周り８マスをオープン
 		if(cnt == sq[y][x].getBomNum()) {
 			for(int i=-1; i<=1;i++) {
 				for(int j=-1;j<=1;j++) {
-					if(i == 0 && j == 0) continue;
 					open(x + j, y + i);
 				}
 			}
 		}
+
 		return;
 	}
 
-	// 爆弾フラグの反転
+	// 爆弾フラグを反転させ、未フラグ数を変動
 	public void setFlag(int x, int y) {
+		// すでに開いているマスにはなにもしない
 		if(sq[y][x].isOpen()) return;
-		sq[y][x].setUserFlag(!sq[y][x].isUserFlaged());
-		if(sq[y][x].isUserFlaged()) unFlagedNum--;
-		else unFlagedNum++;
+
+		boolean flag = sq[y][x].isUserFlaged();
+		if(flag) unFlagedNum++;
+		else unFlagedNum--;
+		sq[y][x].setUserFlag(!flag);
+
 		return;
 	}
 
+	// ゲーム終了チェック
+	// 戻り値：継続:0 クリアー:1 ゲームオーバー:2
+	// 条件   ：爆弾のマスが開いている -> ゲームオーバー
+	//			    爆弾でないマスが全て開いている -> クリアー
+	//			   その他 -> 継続
+	public int checkFinish() {
+		int clearFlag = 1;
+		for(int y=1; y<=heightNum; y++) {
+			for(int x=1; x<=widthNum; x++) {
+				// 爆弾マスが一つでも開いていたら即ゲームオーバー
+				if(sq[y][x].isBomFlag() && sq[y][x].isOpen()) return 2;
+				// 爆弾でないマスで開いていないところがあればクリアではない
+				if(!sq[y][x].isBomFlag() && !sq[y][x].isOpen()) clearFlag = 0;
+			}
+		}
+		return clearFlag;
+	}
+
+	// 各種ゲッター
 	public int getUnFlagedNum() {
 		return unFlagedNum;
 	}
 
+	// 座標(x, y)のマスのインスタンスを返す
 	public Square getSquare(int x, int y) {
 		return sq[y][x];
-	}
-
-	// ゲーム終了チェック 継続:0 クリアー:1 ゲームオーバー:2
-	public int checkFinish() {
-		int clearFlag = 1;
-		for(int i=1; i<=height; i++) {
-			for(int j=1; j<=width; j++) {
-				if(sq[i][j].isBomFlag() && sq[i][j].isOpen()) return 2;
-				if(!sq[i][j].isBomFlag() && !sq[i][j].isOpen()) clearFlag = 0;
-			}
-		}
-		return clearFlag;
 	}
 
 }
