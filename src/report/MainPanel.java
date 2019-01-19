@@ -22,7 +22,6 @@ public class MainPanel extends JPanel implements Runnable{
 
 	// パネルに含むインスタンス群
 	private Sweeper gameUnit;
-	private MyMouseAdapter mouseAdpt;
 	private Status status;
 	private Thread t;
 
@@ -32,20 +31,21 @@ public class MainPanel extends JPanel implements Runnable{
 	// ゲーム本体の情報
 	private int widthNum;
 	private int heightNum;
+	private int bomNum;
 
 	private boolean startFlag;
 
 	// 引数：横マスの数, 縦マスの数, 爆弾の個数, パネル位置x座標, パネル位置y座標, 親フレームのxサイズ, 親フレームのyサイズ
-	MainPanel(int _widthNum, int _heightNum, int bomNum, int left, int top, int windowWidth, int windowHeight){
+	MainPanel(int _widthNum, int _heightNum, int _bomNum, int left, int top, int windowWidth, int windowHeight){
 		super();
 
 		// 初期化
 		startFlag = false;
 		widthNum = _widthNum;
 		heightNum = _heightNum;
+		bomNum = _bomNum;
 
 		gameUnit = new Sweeper(widthNum, heightNum, bomNum);
-		mouseAdpt = new MyMouseAdapter();
 		status = new Status(0, heightNum * BOX_SIZE, bomNum);
 
 		try {
@@ -59,7 +59,7 @@ public class MainPanel extends JPanel implements Runnable{
 		setLayout(null);
 		setBounds(left, top, Math.max(windowWidth, widthNum * BOX_SIZE), heightNum * BOX_SIZE + Status.S_HEIGHT);
 		add(status);
-		addMouseListener(mouseAdpt);
+		addMouseListener(new MyMouseAdapter());
 
 		// スレッド操作
 		t = new Thread(this);

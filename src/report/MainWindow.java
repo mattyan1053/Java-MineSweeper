@@ -1,6 +1,8 @@
 package report;
 
 import java.awt.Container;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -14,9 +16,6 @@ public class MainWindow extends JFrame{
 	// フレーム外枠サイズ
 	public static final int MARGIN_WIDTH = 8;
 	public static final int MARGIN_HEIGHT = 30;
-
-	private int windowWidth;
-	private int windowHeight;
 
 	private Container content;
 	private MainPanel mainContent;
@@ -69,6 +68,9 @@ public class MainWindow extends JFrame{
 
 		// ボタンの配置
 		for(int i = 0; i < buttonNum; i++) {
+			// フォーカスが常にいずれかのボタンにあるため、キーリスナーはボタンに登録
+			button[i].addKeyListener(new MyKeyAdapter());
+
 			button[i].setBounds(BUTTON_WIDTH * i, 0, BUTTON_WIDTH, BUTTON_HEIGHT);
 			content.add(button[i]);
 		}
@@ -78,9 +80,27 @@ public class MainWindow extends JFrame{
 
 	}
 
+	// 画面情報群
+	private int windowWidth;
+	private int windowHeight;
+
+	private int widthNum;
+	private int heightNum;
+	private int bomNum;
+	private int left;
+	private int top;
+
 	// ゲームパネル生成
+	// mainContentインスタンスを再生成する
 	// 引数：横マス数、縦マス数、爆弾数、左上x座標、左上y座標
-	private void makeMainPanel(int widthNum, int heightNum, int bomNum, int left, int top) {
+	private void makeMainPanel(int _widthNum, int _heightNum, int _bomNum, int _left, int _top) {
+
+		// 各値設定
+		widthNum = _widthNum;
+		heightNum = _heightNum;
+		bomNum = _bomNum;
+		left = _left;
+		top = _top;
 
 		// ウィンドウのリサイズ
 		windowWidth = Math.max(BUTTON_WIDTH * buttonNum, widthNum * MainPanel.BOX_SIZE + MARGIN_WIDTH);
@@ -91,6 +111,24 @@ public class MainWindow extends JFrame{
 		mainContent  = new MainPanel(widthNum, heightNum, bomNum, left, top, windowWidth, windowHeight);
 		content.add(mainContent);
 
+	}
+
+	// キーボード入力リスナー
+	// 'R'を離す入力のみ判定する
+	public class MyKeyAdapter extends KeyAdapter {
+
+		public MyKeyAdapter(){
+			System.out.println("Called Constructer of KeyAdapter");
+		}
+
+		// キー押下時インスタンスの再生成
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if(e.getKeyCode() == KeyEvent.VK_R) {
+				content.remove(mainContent);
+				makeMainPanel(widthNum, heightNum, bomNum, left, top);
+			}
+		}
 	}
 
 }
