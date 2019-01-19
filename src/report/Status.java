@@ -23,10 +23,10 @@ public class Status extends JPanel{
 	public static final int TIMER_WIDTH = 120;
 	public static final int TIMER_HEIGHT = 45;
 
-	public static final int FLAG_NUM_WIDTH = 100;
+	public static final int FLAG_NUM_WIDTH = 150;
 	public static final int FLAG_NUM_HEIGHT = 20;
 
-	public static final int CS_WIDTH = 100;
+	public static final int CS_WIDTH = 150;
 	public static final int CS_HEIGHT = 20;
 
 	private MyTimer timer;
