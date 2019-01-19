@@ -15,6 +15,7 @@ import javax.swing.JPanel;
  * 描画処理と内部処理は別スレッドで行う
  * Sweeperインスタンスから読み取った情報を実際に描画していく
  */
+@SuppressWarnings("serial")
 public class MainPanel extends JPanel implements Runnable{
 
 	public static final int BOX_SIZE = 20;

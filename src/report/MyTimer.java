@@ -9,6 +9,7 @@ import javax.swing.border.BevelBorder;
 /*
  * タイマーラベルを生成するクラス
  */
+@SuppressWarnings("serial")
 public class MyTimer extends JLabel{
 
 	private Timer timer;

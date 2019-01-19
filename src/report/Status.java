@@ -10,6 +10,7 @@ import javax.swing.border.LineBorder;
 /*
  * ステータス欄のパネル
  */
+@SuppressWarnings("serial")
 public class Status extends JPanel{
 
 	// 定数群

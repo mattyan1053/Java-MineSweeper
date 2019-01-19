@@ -11,6 +11,7 @@ import javax.swing.JFrame;
  * アプリケーションのウィンドウを生成するクラス
  * 中にボタンやゲーム本体のパネルなどを配置している
  */
+@SuppressWarnings("serial")
 public class MainWindow extends JFrame{
 
 	// フレーム外枠サイズ
