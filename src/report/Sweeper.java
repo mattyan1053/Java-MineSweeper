@@ -4,6 +4,7 @@ import java.util.Random;
 
 /*
  * ゲーム本体の内部処理を行っているクラス
+ * ゲーム開始時には必ずinitGame関数を呼び出さなければならない
  */
 public class Sweeper {
 
@@ -36,6 +37,7 @@ public class Sweeper {
 
 	// ゲームの初期化
 	// 爆弾を配置し、周りの爆弾数を記憶する
+	// この関数は、必ずゲーム開始時に呼び出されなければならない
 	// 引数：最初に開けるマス（fx, fy）
 	public void initGame(int fx, int fy) {
 		Random r = new Random();
