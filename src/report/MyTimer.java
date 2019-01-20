@@ -38,8 +38,10 @@ public class MyTimer extends JLabel{
 		task.cancel();
 	}
 
-	// スケジュール実行する内容を定義
-	class MyTask extends TimerTask {
+	/*
+	 * スケジュール実行する内容を定義するクラス
+	 */
+	public class MyTask extends TimerTask {
 
 		// 実時間で１秒経つごとにTimeを１秒進める
 		@Override
@@ -50,34 +52,34 @@ public class MyTimer extends JLabel{
 
 	}
 
-}
-/*
- * タイムを保持、操作するクラス
- */
-class Time {
-	private int second;
-	private int minute;
-
-	public Time() {
-		second = 0;
-		minute = 0;
-	}
-
-	// 一秒進める
-	public void tick() {
-		second++;
-		if(second >= 60) {
-			minute++;
+	/*
+	 * タイムを保持、操作するクラス
+	 */
+	public class Time {
+		private int second;
+		private int minute;
+		
+		public Time() {
 			second = 0;
+			minute = 0;
 		}
+		
+		// 一秒進める
+		public void tick() {
+			second++;
+			if(second >= 60) {
+				minute++;
+				second = 0;
+			}
+		}
+		
+		// ゲッター群
+		public int getSecond() {
+			return second;
+		}
+		public int getMinute() {
+			return minute;
+		}
+		
 	}
-
-	// ゲッター群
-	public int getSecond() {
-		return second;
-	}
-	public int getMinute() {
-		return minute;
-	}
-
 }

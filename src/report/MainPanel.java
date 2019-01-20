@@ -37,7 +37,7 @@ public class MainPanel extends JPanel implements Runnable{
 	private boolean startFlag;
 
 	// 引数：横マスの数, 縦マスの数, 爆弾の個数, パネル位置x座標, パネル位置y座標, 親フレームのxサイズ, 親フレームのyサイズ
-	MainPanel(int _widthNum, int _heightNum, int _bomNum, int left, int top, int windowWidth, int windowHeight){
+	public MainPanel(int _widthNum, int _heightNum, int _bomNum, int left, int top, int windowWidth, int windowHeight){
 		super();
 
 		// 初期化
@@ -141,7 +141,7 @@ public class MainPanel extends JPanel implements Runnable{
 		private int mx;
 		private int my;
 
-		MyMouseAdapter(){
+		public MyMouseAdapter(){
 			// 初期化
 			mouseState = NO_CHANGE;
 			mx = 0;

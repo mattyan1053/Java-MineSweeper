@@ -17,7 +17,7 @@ public class Sweeper {
 	// 爆弾数ーフラグ数
 	private int unFlagedNum;
 
-	Sweeper(int _widthNum, int _heightNum, int _bomNum){
+	public Sweeper(int _widthNum, int _heightNum, int _bomNum){
 
 		widthNum = _widthNum;
 		heightNum = _heightNum;

@@ -27,7 +27,7 @@ public class MainWindow extends JFrame{
 	public static final int BUTTON_WIDTH = 100;
 	public static final int BUTTON_HEIGHT = 30;
 
-	MainWindow(String _title){
+	public MainWindow(String _title){
 
 		// ウィンドウの設定
 		setTitle(_title);

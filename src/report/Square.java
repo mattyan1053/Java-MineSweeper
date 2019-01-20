@@ -11,7 +11,7 @@ public class Square {
 	private boolean userFlag;
 	private int bomNum;
 
-	Square(){
+	public Square(){
 		openFlag = false;
 		bomFlag = false;
 		userFlag = false;
