@@ -24,7 +24,7 @@ public class MainPanel extends JPanel implements Runnable{
 	// パネルに含むインスタンス群
 	private Sweeper gameUnit;
 	private Status status;
-	private Thread t;
+	private Thread thrd;
 
 	// 画像ハンドラ
 	private BufferedImage img;
@@ -63,8 +63,8 @@ public class MainPanel extends JPanel implements Runnable{
 		addMouseListener(new MyMouseAdapter());
 
 		// スレッド操作
-		t = new Thread(this);
-		t.start();
+		thrd = new Thread(this);
+		thrd.start();
 
 	}
 
