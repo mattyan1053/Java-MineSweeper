@@ -46,6 +46,7 @@ public class Sweeper {
 		for(int bom = bomNum; bom > 0; bom--) {
 			boolean breakFlag = false;
 			while(!breakFlag) {
+				// 乱数の生成、ダミーマスを除外
 				int x = r.nextInt(widthNum) + 1;
 				int y = r.nextInt(heightNum) + 1;
 				// 初期マスなので爆弾配置から除外
