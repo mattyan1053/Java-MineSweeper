@@ -99,6 +99,7 @@ public class Sweeper {
 	}
 
 	// フラグの数と周りの爆弾の数が一致しているときまとめて周り８マスをオープン
+	// 引数：あけたい８マスの中央のマスの座標x, y
 	public void openFull(int x, int y) {
 		// 開いていないマスならなにもしない
 		if(!sq[y][x].isOpen()) return;
@@ -125,6 +126,7 @@ public class Sweeper {
 	}
 
 	// 爆弾フラグを反転させ、未フラグ数を変動
+	// 引数：フラグを立てたいマスの座標x, y
 	public void setFlag(int x, int y) {
 		// すでに開いているマスにはなにもしない
 		if(sq[y][x].isOpen()) return;
@@ -155,12 +157,13 @@ public class Sweeper {
 		return clearFlag;
 	}
 
-	// 各種ゲッター
+	// ゲッター
 	public int getUnFlagedNum() {
 		return unFlagedNum;
 	}
 
 	// 座標(x, y)のマスのインスタンスを返す
+	// 引数：取得したいSquareインスタンスの座標x, y
 	public Square getSquare(int x, int y) {
 		return sq[y][x];
 	}
