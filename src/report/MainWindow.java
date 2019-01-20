@@ -51,6 +51,7 @@ public class MainWindow extends JFrame{
 		 *		makeMainPanel(widthNum, heightNum, bomNum, left, top);
 		 * });
 		 */
+		// マス目の数などは手動設定でありマジックナンバー
 		button[0] = new JButton("10×10");
 		button[0].addActionListener(e -> {
 			content.remove(mainContent);
@@ -77,6 +78,7 @@ public class MainWindow extends JFrame{
 		}
 
 		// 初期ゲームパネル
+		// ここが実質的な初期化なのでマジックナンバーとなっている
 		makeMainPanel(10, 10, 10, 0, BUTTON_HEIGHT);
 
 	}
