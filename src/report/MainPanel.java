@@ -78,7 +78,7 @@ public class MainPanel extends JPanel implements Runnable{
 			// フラグ数をステータス欄に反映
 			status.setUnFlagedNum(gameUnit.getUnFlagedNum());
 
-			// ゲーム終了ならステータス欄を変更して離脱
+			// ゲーム終了ならステータス欄の文字列を変更し、タイマーを止めて離脱
 			if(status.setFinishString(gameUnit.checkFinish()) != 0) {
 				status.timerStop();
 				break;
@@ -89,37 +89,44 @@ public class MainPanel extends JPanel implements Runnable{
 	// ゲーム本体描画部分
 	@Override
 	public void paintComponent(Graphics g) {
+		// 親クラスのメソッドを呼んでおかない場合描画がズレてしまうことがある。
 		super.paintComponent(g);
 
 		for(int y=1; y<=heightNum; y++) {
 			for(int x=1; x<=widthNum; x++) {
 				Square s = gameUnit.getSquare(x , y);
-				// マスの描画開始位置(destination)
+				// 描画したいマスの左上座標(destination)
 				int dx = (x - 1) * BOX_SIZE;
 				int dy = (y - 1) * BOX_SIZE;
 
-				// 各マスの描画処理
+				// 各マスの描画処理(リソース画像を参照すること)
 				if(s.isUserFlaged()){
-					g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * 2, 0, IMAGE_TIPS_SIZE * 3, IMAGE_TIPS_SIZE, this);
+					g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE,
+							IMAGE_TIPS_SIZE * 2, 0, IMAGE_TIPS_SIZE * 3, IMAGE_TIPS_SIZE, this);
 				}
 				else if(!s.isOpen()) {
-					g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, 0, 0, IMAGE_TIPS_SIZE, IMAGE_TIPS_SIZE, this);
+					g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE,
+							0, 0, IMAGE_TIPS_SIZE, IMAGE_TIPS_SIZE, this);
 				}
 				else {
 					if(s.isBomFlag()) {
-						g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * 3, 0, IMAGE_TIPS_SIZE * 4, IMAGE_TIPS_SIZE, this);
+						g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE,
+								IMAGE_TIPS_SIZE * 3, 0, IMAGE_TIPS_SIZE * 4, IMAGE_TIPS_SIZE, this);
 					}
 					else {
 						// まわりの爆弾の数にあわせて数字の画像を表示
 						int bNum = s.getBomNum();
 						if(bNum == 0) {
-							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE, 0, IMAGE_TIPS_SIZE * 2, IMAGE_TIPS_SIZE, this);
+							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE,
+									IMAGE_TIPS_SIZE, 0, IMAGE_TIPS_SIZE * 2, IMAGE_TIPS_SIZE, this);
 						}
 						else if(bNum <= 4) {
-							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * (bNum - 1), IMAGE_TIPS_SIZE, IMAGE_TIPS_SIZE * bNum, IMAGE_TIPS_SIZE * 2, this);
+							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE,
+									IMAGE_TIPS_SIZE * (bNum - 1), IMAGE_TIPS_SIZE, IMAGE_TIPS_SIZE * bNum, IMAGE_TIPS_SIZE * 2, this);
 						}
 						else {
-							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE, IMAGE_TIPS_SIZE * (bNum - 5), IMAGE_TIPS_SIZE * 2, IMAGE_TIPS_SIZE * (bNum - 4), IMAGE_TIPS_SIZE * 3, this);
+							g.drawImage(img, dx, dy, dx + BOX_SIZE, dy + BOX_SIZE,
+									IMAGE_TIPS_SIZE * (bNum - 5), IMAGE_TIPS_SIZE * 2, IMAGE_TIPS_SIZE * (bNum - 4), IMAGE_TIPS_SIZE * 3, this);
 						}
 					}
 				}

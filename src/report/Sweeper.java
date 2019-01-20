@@ -3,7 +3,7 @@ package report;
 import java.util.Random;
 
 /*
- * ゲーム本体の内部処理を行っているクラス
+ * マインスイーパー本体の内部処理を行っているクラス
  * ゲーム開始時には必ずinitGame関数を呼び出さなければならない
  */
 public class Sweeper {

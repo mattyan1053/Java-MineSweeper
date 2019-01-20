@@ -50,6 +50,7 @@ public class MainWindow extends JFrame{
 		 *		content.remove(mainContent);
 		 *		makeMainPanel(widthNum, heightNum, bomNum, left, top);
 		 * });
+		 * また、buttonNumの調整も行うこと
 		 */
 		// マス目の数などは手動設定でありマジックナンバー
 		button[0] = new JButton("10×10");
@@ -70,11 +71,11 @@ public class MainWindow extends JFrame{
 
 		// ボタンの配置
 		for(int i = 0; i < buttonNum; i++) {
-			// フォーカスが常にいずれかのボタンにあるため、キーリスナーはボタンに登録
-			button[i].addKeyListener(new MyKeyAdapter());
-
 			button[i].setBounds(BUTTON_WIDTH * i, 0, BUTTON_WIDTH, BUTTON_HEIGHT);
 			content.add(button[i]);
+			
+			// フォーカスが常にいずれかのボタンにあるため、キーリスナーはボタンに登録
+			button[i].addKeyListener(new MyKeyAdapter());
 		}
 
 		// 初期ゲームパネル
