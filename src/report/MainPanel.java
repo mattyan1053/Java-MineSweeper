@@ -73,16 +73,16 @@ public class MainPanel extends JPanel implements Runnable{
 	public void run() {
 		while(true) {
 
-			repaint();
-
 			// フラグ数をステータス欄に反映
 			status.setUnFlagedNum(gameUnit.getUnFlagedNum());
 
 			// ゲーム終了ならステータス欄の文字列を変更し、タイマーを止めて離脱
 			if(status.setFinishString(gameUnit.checkFinish()) != 0) {
 				status.timerStop();
+				repaint();
 				break;
 			}
+			repaint();
 		}
 	}
 
