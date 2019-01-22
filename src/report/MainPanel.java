@@ -50,7 +50,7 @@ public class MainPanel extends JPanel implements Runnable{
 		status = new Status(0, heightNum * BOX_SIZE, bomNum);
 
 		try {
-			img = ImageIO.read(new File("./src/report/box.bmp"));
+			img = ImageIO.read(new File("resource/box.bmp"));
 		} catch (IOException e) {
 			System.err.println("Failed to Load Image File.");
 			e.printStackTrace();
